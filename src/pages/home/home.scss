@@ -1,0 +1,29 @@
+.home {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  .buttonClicks {
+      color: #ffffff;
+      letter-spacing: 0.04em;
+      font-size: 0.4em;
+  }
+
+  .homeButton {
+    margin: 1em auto;
+    width: 75%;
+  }
+
+  .homeHeading {
+    &:after {
+      display: block;
+      color: #ffffff;
+      letter-spacing: 0.04em;
+      content: "Typescript, React, Webpack, Babel, Redux and Sass, Oh my!";
+      font-size: 0.4em;
+    }
+  }
+}
