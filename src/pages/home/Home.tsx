@@ -1,61 +1,121 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { Link } from 'react-router-dom';
+import { firestore } from 'firebase';
 
 import Types from 'Types';
 
-import { BUTTON_CLICK } from '../../redux/actions/actionTypes';
-import { ExternalLinkButton } from '../../components/ExternalLinkButton';
 import { Heading } from '../../components/Heading';
-import styles from './home.scss';
-import { buttonClick } from '../../redux/actions/home';
+import { ScoreSquare } from '../../components/ScoreSquare';
+import { scoresCollection, chordsCollection } from '../../firebase/firebase';
+import { FETCH_CHORD_CHANGE_SCORES, FETCH_CHORDS } from '../../redux/actions/actionTypes';
+import { ChordAction } from '../../redux/reducers/chords';
 
+import styles from './home.scss';
 
 interface HomeProps {
-  appLoaded: boolean;
-  buttonClicks: number;
-  onButtonClick: () => null;
+  chords: Types.Chord[];
+  chordChangeScores: Types.ChordChangeScore[];
+  onFetchChords: (chords: Types.Chord[]) => null;
+  onFetchChordChangeScores: (chordChangeScores: Types.ChordChangeScore[]) => null;
 }
 
-let HomePage = (props: HomeProps) => {
-  let buttonClickHandler = () => {
-		props.onButtonClick();
+class HomePage extends Component<HomeProps> {
+  extractScores = (snapshot: firestore.QuerySnapshot): Types.ChordChangeScore[] => {
+    let scores: Types.ChordChangeScore[] = [];
+
+    snapshot.forEach((doc: firestore.QueryDocumentSnapshot) => {
+      let data = doc.data();
+
+      scores.push({
+        date: data.date,
+        chordOne: data.chordOne,
+        chordTwo: data.chordTwo,
+        count: data.count
+      })
+    })
+
+    return scores;
   }
 
-  return (
-    <div className={ styles.home }>
-      <Heading className={ styles.homeHeading }
-                text={ "Jamal's React Template " + (props.appLoaded ? "Has Loaded!" : "") } />
-      <ExternalLinkButton className={ styles.homeButton }
-                          href="https://reactjs.org/docs/getting-started.html"
-                          text="View React Docs"
-                          onClick={ buttonClickHandler } />
-      <ExternalLinkButton className={ styles.homeButton }
-                          href="https://webpack.js.org/concepts"
-                          text="View Webpack Docs"
-                          onClick={ buttonClickHandler } />
-      <Link to="/example">Go To Example Page</Link>
-      <div className={ styles.buttonClicks }>
-        { props.buttonClicks === 1
-            ? "1 Button Click"
-            : props.buttonClicks + " Button Clicks" }
+  extractChords = (snapshot: firestore.QuerySnapshot): Types.Chord[] => {
+    let chords: Types.Chord[] = [];
+
+    snapshot.forEach((doc: firestore.QueryDocumentSnapshot) => {
+      let data = doc.data();
+
+      chords.push({
+        name: data.name
+      })
+    })
+
+    return chords;
+  }
+
+  componentDidMount() {
+    if (!this.props.chords.length) {
+      chordsCollection
+        .get()
+        .then((snapshot: firestore.QuerySnapshot) => this.props.onFetchChords(this.extractChords(snapshot)))
+        .catch((err: Error) => console.error("Failed to retrieve chord list." + err.message))
+    }
+
+    if (!this.props.chordChangeScores.length) {
+      scoresCollection
+        .get()
+        .then((snapshot: firestore.QuerySnapshot) => this.props.onFetchChordChangeScores(this.extractScores(snapshot)))
+        .catch((err: Error) => console.error("Failed to retrieve scores." + err.message));
+    }
+  }
+
+  buildOneRow = (start: Types.Chord) => {
+    let cells = [];
+
+    for (let i = 0; i < this.props.chords.length; i++) {
+      cells.push(
+        <ScoreSquare
+          chordOne={start}
+          chordTwo={this.props.chords[i]}
+          score={0}
+        />
+      )
+    }
+
+    return cells;
+  }
+
+  buildRows = () => {
+    let rows = [];
+
+    for (let i = this.props.chords.length - 1; i >= 0; i--) {
+      rows.push(<div className={styles.chordRow}>{this.buildOneRow(this.props.chords[i])}</div>)
+    }
+
+    return rows;
+  }
+
+  render() {
+    return (
+      <div className={ styles.home }>
+        <Heading className={ styles.homeHeading } text="Chord Change Trainer" />
+          <div className={ styles.chordGrid }>
+            { this.buildRows() }
+          </div>
       </div>
-    </div>
-  )
+    )
+  }
 };
 
 const mapStateToProps = (state: Types.RootState) => {
   return {
-    appLoaded: state.app.appLoaded,
-    buttonClicks: state.home.buttonClicks,
+    chords: state.chord.chords,
+    chordChangeScores: state.chord.chordChangeScores,
   }
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Types.RootAction>) => {
-	return {
-		onButtonClick: () => dispatch(buttonClick())
-	}
-}
+const mapDispatchToProps = (dispatch: Dispatch<ChordAction>) => ({
+  onFetchChords: (chords: Types.Chord[]) => dispatch({ type: FETCH_CHORDS, payload: chords }),
+  onFetchChordChangeScores: (chordChangeScores: Types.ChordChangeScore[]) => dispatch({ type: FETCH_CHORD_CHANGE_SCORES, payload: chordChangeScores }),
+});
 
 export const Home = connect(mapStateToProps, mapDispatchToProps)(HomePage);

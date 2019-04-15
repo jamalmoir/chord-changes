@@ -1,4 +1,5 @@
 .home {
+  background: #1d1625;
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -18,12 +19,12 @@
   }
 
   .homeHeading {
-    &:after {
-      display: block;
-      color: #ffffff;
-      letter-spacing: 0.04em;
-      content: "Typescript, React, Webpack, Babel, Redux and Sass, Oh my!";
-      font-size: 0.4em;
+  }
+
+  .chordGrid {
+    .chordRow {
+      display: flex;
+      flex-direction: row;
     }
   }
 }
