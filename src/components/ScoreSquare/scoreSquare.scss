@@ -1,0 +1,16 @@
+.scoreSquare {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3em;
+  height: 3em;
+  margin: 0.1em;
+  background-color: #b7673c;
+  color: #ffffff;
+  font-size: 1.5em;
+  font-weight: 600;
+
+  &:hover {
+    background-color: #b9b0b2;
+  }
+}
