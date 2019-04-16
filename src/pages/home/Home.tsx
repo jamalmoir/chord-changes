@@ -6,7 +6,7 @@ import { firestore } from 'firebase';
 import Types from 'Types';
 
 import { Heading } from '../../components/Heading';
-import { ScoreSquare } from '../../components/ScoreSquare';
+import { ChordChangeScoreGrid } from '../../components/ChordChangeScoreGrid';
 import { scoresCollection, chordsCollection } from '../../firebase/firebase';
 import { FETCH_CHORD_CHANGE_SCORES, FETCH_CHORDS } from '../../redux/actions/actionTypes';
 import { ChordAction } from '../../redux/reducers/chords';
@@ -15,7 +15,7 @@ import styles from './home.scss';
 
 interface HomeProps {
   chords: Types.Chord[];
-  chordChangeScores: Types.ChordChangeScore[];
+  scores: Types.ChordChangeScore[];
   onFetchChords: (chords: Types.Chord[]) => null;
   onFetchChordChangeScores: (chordChangeScores: Types.ChordChangeScore[]) => null;
 }
@@ -60,7 +60,7 @@ class HomePage extends Component<HomeProps> {
         .catch((err: Error) => console.error("Failed to retrieve chord list." + err.message))
     }
 
-    if (!this.props.chordChangeScores.length) {
+    if (!this.props.scores.length) {
       scoresCollection
         .get()
         .then((snapshot: firestore.QuerySnapshot) => this.props.onFetchChordChangeScores(this.extractScores(snapshot)))
@@ -68,39 +68,11 @@ class HomePage extends Component<HomeProps> {
     }
   }
 
-  buildOneRow = (start: Types.Chord) => {
-    let cells = [];
-
-    for (let i = 0; i < this.props.chords.length; i++) {
-      cells.push(
-        <ScoreSquare
-          chordOne={start}
-          chordTwo={this.props.chords[i]}
-          score={0}
-        />
-      )
-    }
-
-    return cells;
-  }
-
-  buildRows = () => {
-    let rows = [];
-
-    for (let i = this.props.chords.length - 1; i >= 0; i--) {
-      rows.push(<div className={styles.chordRow}>{this.buildOneRow(this.props.chords[i])}</div>)
-    }
-
-    return rows;
-  }
-
   render() {
     return (
       <div className={ styles.home }>
         <Heading className={ styles.homeHeading } text="Chord Change Trainer" />
-          <div className={ styles.chordGrid }>
-            { this.buildRows() }
-          </div>
+        <ChordChangeScoreGrid chords={ this.props.chords } scores={ this.props.scores } />
       </div>
     )
   }
@@ -109,7 +81,7 @@ class HomePage extends Component<HomeProps> {
 const mapStateToProps = (state: Types.RootState) => {
   return {
     chords: state.chord.chords,
-    chordChangeScores: state.chord.chordChangeScores,
+    scores: state.chord.chordChangeScores,
   }
 };
 
