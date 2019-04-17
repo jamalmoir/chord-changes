@@ -37,7 +37,7 @@ module.exports = {
               localIdentName: '[local]__[hash:base64:5]'
             }
           },
-          { 
+          {
             loader: 'sass-loader',
             options: {
               includePaths: [path.styles],

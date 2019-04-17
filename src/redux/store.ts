@@ -2,11 +2,13 @@ import { applyMiddleware, createStore, compose } from 'redux';
 import { createLogger } from 'redux-logger'
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 import { routerMiddleware } from 'connected-react-router'
-import { createBrowserHistory } from 'history';
+// import { createBrowserHistory } from 'history';
+import { createHashHistory } from 'history';
 
 import createRootReducer from './reducer';
 
-export const history = createBrowserHistory();
+// export const history = createBrowserHistory();
+export const history = createHashHistory();
 
 const middleware = routerMiddleware(history);
 const composedMiddleware = process.env.NODE_ENV === 'production'
