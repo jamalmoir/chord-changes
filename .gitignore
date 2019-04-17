@@ -5,3 +5,4 @@ node_modules
 .vscode
 yarn-error.log
 src/firebase/dev.ts
+build
