@@ -31,7 +31,7 @@ interface AppProps {
 
 const content = (
     <Switch>
-      <ProtectedRoute exact path="/" component={ Home }/>
+      <Route exact path="/" component={ Home }/>
       <Route exact path="/login" component={ Login }/>
       <ProtectedRoute exact path="/example" component={ Example }/>
     </Switch>
