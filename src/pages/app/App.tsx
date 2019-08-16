@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
 import { Dispatch } from 'redux';
+import Modal from 'react-modal';
 
 import Types from 'Types'
 
@@ -36,6 +37,8 @@ const content = (
       <ProtectedRoute exact path="/example" component={ Example }/>
     </Switch>
 )
+
+Modal.setAppElement('#root')
 
 class AppPage extends React.Component<AppProps> {
   componentDidMount() {

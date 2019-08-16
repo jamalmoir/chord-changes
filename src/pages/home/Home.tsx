@@ -7,6 +7,7 @@ import Types from 'Types';
 
 import { Heading } from '../../components/Heading';
 import { ChordChangeScoreGrid } from '../../components/ChordChangeScoreGrid';
+import { ChordChangeModal } from '../../components/ChordChangesModal';
 import { scoresCollection, chordsCollection } from '../../firebase/firebase';
 import { FETCH_CHORD_CHANGE_SCORES, FETCH_CHORDS } from '../../redux/actions/actionTypes';
 import { ChordAction } from '../../redux/reducers/chords';
@@ -20,7 +21,23 @@ interface HomeProps {
   onFetchChordChangeScores: (chordChangeScores: Types.ChordChangeScore[]) => null;
 }
 
-class HomePage extends Component<HomeProps> {
+interface HomeState {
+  currentChordA: Types.Chord;
+  currentChordB: Types.Chord;
+  modalIsOpen: boolean;
+}
+
+class HomePage extends Component<HomeProps, HomeState> {
+  constructor(props: HomeProps) {
+    super(props);
+
+    this.state = {
+      currentChordA: null,
+      currentChordB: null,
+      modalIsOpen: false
+    }
+  }
+
   extractScores = (snapshot: firestore.QuerySnapshot): Types.ChordChangeScore[] => {
     let scores: Types.ChordChangeScore[] = [];
 
@@ -68,11 +85,31 @@ class HomePage extends Component<HomeProps> {
     }
   }
 
+  openChordChangeModal = (chordA: Types.Chord, chordB: Types.Chord) => {
+    this.setState((prevState: HomeState) => {
+      return {
+        ...prevState,
+        currentChordA: chordA,
+        currentChordB: chordB,
+        modalIsOpen: true
+      }
+    })
+  }
+
   render() {
     return (
       <div className={ styles.home }>
         <Heading className={ styles.homeHeading } text="Chord Change Trainer" />
-        <ChordChangeScoreGrid chords={ this.props.chords } scores={ this.props.scores } />
+        <ChordChangeModal
+          isOpen={ this.state.modalIsOpen }
+          chordA={ this.state.currentChordA }
+          chordB={ this.state.currentChordB }
+        />
+        <ChordChangeScoreGrid 
+          chords={ this.props.chords }
+          scores={ this.props.scores }
+          onScoreSquareClick={ this.openChordChangeModal }
+        />
       </div>
     )
   }

@@ -9,6 +9,7 @@ import { ScoreSquare } from '../ScoreSquare';
 interface ChordChangeScoreGridProps {
   chords: Types.Chord[];
   scores: Types.ChordChangeScore[];
+  onScoreSquareClick: (...args: any[]) => any;
 }
 
 const getScore = (chordOne: Types.Chord, chordTwo: Types.Chord, scores: Types.ChordChangeScore[]) => {
@@ -23,7 +24,8 @@ const getScore = (chordOne: Types.Chord, chordTwo: Types.Chord, scores: Types.Ch
   }
 }
 
-const buildOneRow = (row: number, chords: Types.Chord[], scores: Types.ChordChangeScore[]) => {
+const buildOneRow = (row: number, chords: Types.Chord[], scores: Types.ChordChangeScore[],
+                     onClick: (...args: any[]) => any) => {
   let cells = [],
       start = chords[row];
 
@@ -34,6 +36,7 @@ const buildOneRow = (row: number, chords: Types.Chord[], scores: Types.ChordChan
         chordTwo={ chords[i] }
         score={ getScore(start, chords[i], scores) }
         key={ chords[i].name }
+        onClick={ onClick }
       />
     )
   }
@@ -41,11 +44,11 @@ const buildOneRow = (row: number, chords: Types.Chord[], scores: Types.ChordChan
   return cells;
 }
 
-const buildRows = (chords: Types.Chord[], scores: Types.ChordChangeScore[]) => {
+const buildRows = (chords: Types.Chord[], scores: Types.ChordChangeScore[], onClick: (...args: any[]) => any) => {
   let rows = [];
 
   for (let i = chords.length - 1; i >= 0; i--) {
-    rows.push(<div className={ styles.chordRow } key={ chords[i].name }>{ buildOneRow(i, chords, scores) }</div>)
+    rows.push(<div className={ styles.chordRow } key={ chords[i].name }>{ buildOneRow(i, chords, scores, onClick) }</div>)
   }
 
   return rows;
@@ -81,7 +84,7 @@ export const ChordChangeScoreGrid = (props: ChordChangeScoreGridProps) => {
         { buildYTicks(props.chords) }
       </div>
       <div className={ styles.scoreGrid }>
-        { buildRows(props.chords, props.scores) }
+        { buildRows(props.chords, props.scores, props.onScoreSquareClick) }
       </div>
     </div>
   )

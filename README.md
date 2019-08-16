@@ -21,3 +21,6 @@ Code Guidelines:
 - Use functional components where they can be used.
 - Use presentational (ui pieces to be displayed) vs. container (business logic & state) components.
 - JSX and user facing strings use double quotes, others use single.
+
+Other:
+[Color Palette](https://avemateiu.com/color-palettes/color-palette-107/)
